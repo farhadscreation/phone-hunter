@@ -38,7 +38,8 @@ const displayPhones = (phones, dataLimit) => {
         <div class="card-body">
         <h5 class="card-title">${phone.phone_name}</h5>
         <h5>Brand: ${phone.brand}</h5>
-        <button href="#" class="btn btn-primary mt-3">Go somewhere</Button>
+        <!-- Button trigger modal -->
+        <button onclick="loadPhoneDetails('${phone.slug}')" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#phoneDataDetails">Show Details</Button>
         </div>
         </div>
     </div>
@@ -63,6 +64,16 @@ document.getElementById('btn-search').addEventListener('click', function(){
     processSearch(10);
 })
 
+// search input field in enter key 
+document.getElementById('search-field').addEventListener('keypress', function(e){
+
+    if (e.key === 'Enter'){
+        processSearch(10);
+    }
+})
+
+
+
 // loader function
 const toggleSpinner = isLoading => {
     const loaderSection = document.getElementById('search-loader');
@@ -79,4 +90,30 @@ document.getElementById('btn-load-more').addEventListener('click', function(){
     processSearch();
 })
 
-// loadPhones();
+// load the modal for phone details
+
+const loadPhoneDetails = async id =>{ 
+    const url = `https://openapi.programming-hero.com/api/phone/${id}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    displayPhoneDetails(data.data);
+}
+
+
+// modal phone details 
+const displayPhoneDetails = phone => {
+    console.log(phone)
+    const modalTitle = document.getElementById('phoneDataDetailsLabel');
+    modalTitle.innerText = phone.name;
+    const phoneDetails = document.getElementById('phone-details');
+    phoneDetails.innerHTML = `
+        <h6>Name: ${phone.name}</h6>
+        <p class="p-0 m-0">Release Date: ${phone.releaseDate ? phone.releaseDate : 'Not available'}</p>
+        <p class="p-0 m-0">Bluetooth: ${phone.others ? phone.others.Bluetooth : 'Not available'}</p>
+        <p>Sensor: ${phone.mainFeatures ? phone.mainFeatures.sensors [0] : 'Not available'}</p>
+    
+    `;
+}
+
+
+loadPhones('apple');
